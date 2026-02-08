@@ -1,0 +1,194 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Gradle Mastery for Flutter Developers</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="description" content="A complete beginner-to-advanced Gradle guide for Flutter developers. Understand Gradle deeply and fix any Gradle issue."/>
+<link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<header class="hero">
+  <h1>🧠 Gradle Mastery for Flutter Developers</h1>
+  <p>Understand Gradle from ZERO → Fix ANY Gradle issue with logic</p>
+</header>
+
+<nav class="nav">
+  <a href="#intro">Gradle Basics</a>
+  <a href="#internals">How Gradle Works</a>
+  <a href="#files">Gradle Files</a>
+  <a href="#errors">Error Simulator</a>
+  <a href="#tree">Decision Tree</a>
+  <a href="#matrix">Compatibility</a>
+  <a href="#examples">Real Errors</a>
+</nav>
+
+<section id="intro" class="section reveal">
+<h2>1️⃣ What is Gradle (No Confusion)</h2>
+<p>
+Gradle is a <b>build automation system</b>.
+Its job is to convert <b>source code</b> into a <b>final binary</b>.
+</p>
+<div class="card">
+<b>Gradle DOES:</b>
+<ul>
+<li>Download dependencies</li>
+<li>Create build tasks</li>
+<li>Compile code</li>
+<li>Package APK/AAB</li>
+</ul>
+<b>Gradle DOES NOT:</b>
+<ul>
+<li>Write Flutter UI</li>
+<li>Compile Dart</li>
+<li>Run your app logic</li>
+</ul>
+</div>
+</section>
+
+<section id="internals" class="section reveal">
+<h2>2️⃣ How Gradle Works Internally</h2>
+
+<div class="flow">
+<div class="box">Read gradle files</div>
+<div class="arrow">↓</div>
+<div class="box">Configuration Phase</div>
+<div class="arrow">↓</div>
+<div class="box">Task Graph Creation</div>
+<div class="arrow">↓</div>
+<div class="box">Execution Phase</div>
+</div>
+
+<div class="card">
+<h3>Configuration Phase 🧠</h3>
+<ul>
+<li>Reads <code>settings.gradle</code></li>
+<li>Reads all <code>build.gradle</code> files</li>
+<li>Creates tasks</li>
+</ul>
+<p class="danger">❌ If Gradle fails here → version or syntax issue</p>
+</div>
+
+<div class="card">
+<h3>Execution Phase 🏃</h3>
+<ul>
+<li>Runs tasks in order</li>
+<li>Compiles code</li>
+<li>Dex + package</li>
+</ul>
+<p class="danger">❌ If Gradle fails here → dependency / code issue</p>
+</div>
+</section>
+
+<section id="files" class="section reveal">
+<h2>3️⃣ Gradle Files You Must Master</h2>
+
+<pre class="code">
+android/
+├── settings.gradle
+├── build.gradle
+├── gradle.properties
+├── gradle-wrapper.properties
+└── app/build.gradle
+</pre>
+
+<div class="grid">
+<div class="card">
+<h3>settings.gradle</h3>
+<p>Controls plugin management & module loading</p>
+<p class="danger">Break this = Gradle won't start</p>
+</div>
+
+<div class="card">
+<h3>gradle-wrapper.properties</h3>
+<p>Controls Gradle version</p>
+<code>distributionUrl=gradle-8.11.1-all.zip</code>
+</div>
+
+<div class="card">
+<h3>gradle.properties</h3>
+<p>Controls JVM & performance</p>
+<code>org.gradle.jvmargs=-Xmx4g</code>
+</div>
+
+<div class="card">
+<h3>app/build.gradle</h3>
+<p>Controls SDK, deps, R8, signing</p>
+</div>
+</div>
+</section>
+
+<section id="errors" class="section reveal">
+<h2>4️⃣ Interactive Gradle Error Simulator</h2>
+
+<select id="errorSelect">
+<option value="">Select an error</option>
+<option value="gradle">Minimum supported Gradle version is X</option>
+<option value="jdk">Unsupported Java version</option>
+<option value="dex">DexArchiveMergerException</option>
+<option value="r8">R8 missing class</option>
+</select>
+
+<div id="errorBox" class="card"></div>
+</section>
+
+<section id="tree" class="section reveal">
+<h2>5️⃣ Error → Cause → Fix Decision Tree</h2>
+
+<div class="tree">
+<div class="node">Build failed before tasks?
+  <div class="child">➡ Config error → Check Gradle / AGP / Java</div>
+</div>
+<div class="node">Failed during compile?
+  <div class="child">➡ Dependency / Kotlin / Java issue</div>
+</div>
+<div class="node">Failed during dex / R8?
+  <div class="child">➡ Conflict / missing keep rules</div>
+</div>
+</div>
+</section>
+
+<section id="matrix" class="section reveal">
+<h2>6️⃣ AGP – Gradle – Java Compatibility</h2>
+
+<table>
+<tr><th>AGP</th><th>Gradle</th><th>Java</th></tr>
+<tr><td>8.4.x</td><td>8.6+</td><td>17</td></tr>
+<tr><td>8.5.x</td><td>8.8+</td><td>17</td></tr>
+<tr><td>8.9.x</td><td>8.11+</td><td>17</td></tr>
+</table>
+
+<p class="danger">⚠ Wrong combo = instant Gradle failure</p>
+</section>
+
+<section id="examples" class="section reveal">
+<h2>7️⃣ Real Flutter Gradle Errors (Seen in Real Life)</h2>
+
+<div class="card">
+<h3>❌ Minimum supported Gradle version is 8.10.2</h3>
+<p><b>Cause:</b> AGP upgraded but Gradle wrapper not updated</p>
+<p><b>Fix:</b> Update gradle-wrapper.properties</p>
+</div>
+
+<div class="card">
+<h3>❌ DexArchiveMergerException</h3>
+<p><b>Cause:</b> Duplicate classes from dependencies</p>
+<p><b>Fix:</b> Dependency resolution / exclude rules</p>
+</div>
+
+<div class="card">
+<h3>❌ R8 missing class</h3>
+<p><b>Cause:</b> Code shrinking removed needed class</p>
+<p><b>Fix:</b> Add keep rules</p>
+</div>
+</section>
+
+<footer class="footer">
+<p>🎯 If you understand this site, you understand Gradle.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
