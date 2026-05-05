@@ -1,1202 +1,568 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap');
+  <!-- Basic page setup -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Flutter Android Gradle learning website from beginner to advanced." />
+  <title>Flutter Gradle Zero to Hero</title>
 
-  :root {
-    --bg: #0d0f14;
-    --bg2: #13161e;
-    --bg3: #1a1f2e;
-    --card: #1e2334;
-    --border: rgba(99,179,237,0.12);
-    --accent: #63b3ed;
-    --accent2: #7c3aed;
-    --accent3: #10b981;
-    --amber: #f59e0b;
-    --red: #ef4444;
-    --text: #e2e8f0;
-    --muted: #718096;
-    --code-bg: #0a0c10;
-  }
+  <!-- External CSS file. Keep style.css in the same folder as this index.html file. -->
+  <link rel="stylesheet" href="style.css" />
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Syne', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── HEADER ── */
-  .hero {
-    position: relative;
-    padding: 40px 32px 32px;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border);
-  }
-  .hero::before {
-    content:'';
-    position:absolute;
-    inset:0;
-    background: radial-gradient(ellipse 70% 100% at 50% -10%, rgba(99,179,237,.12) 0%, transparent 60%);
-    pointer-events:none;
-  }
-  .badge {
-    display:inline-flex; align-items:center; gap:6px;
-    background: rgba(99,179,237,.12); border:1px solid rgba(99,179,237,.25);
-    border-radius:99px; padding:4px 12px; font-size:11px; font-weight:600;
-    color: var(--accent); letter-spacing:.06em; margin-bottom:16px;
-  }
-  .badge span { width:6px; height:6px; border-radius:50%; background:var(--accent); display:block; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
-
-  h1 { font-size:clamp(22px,4vw,38px); font-weight:800; line-height:1.15; margin-bottom:8px; }
-  h1 span { background: linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .subtitle { color:var(--muted); font-size:14px; font-family: 'JetBrains Mono', monospace; }
-
-  /* ── PROGRESS RING ── */
-  .hero-meta { display:flex; align-items:center; gap:24px; margin-top:20px; flex-wrap:wrap; }
-  .prog-ring { position:relative; width:56px; height:56px; flex-shrink:0; }
-  .prog-ring svg { transform: rotate(-90deg); }
-  .prog-num { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); }
-  .stat { display:flex; flex-direction:column; gap:2px; }
-  .stat-val { font-size:18px; font-weight:700; }
-  .stat-label { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-
-  /* ── NAV TABS ── */
-  .tabs { display:flex; gap:4px; padding:16px 32px 0; border-bottom:1px solid var(--border); overflow-x:auto; }
-  .tab {
-    padding:8px 16px; font-size:12px; font-weight:600; font-family:'JetBrains Mono',monospace;
-    border:none; background:none; color:var(--muted); cursor:pointer; border-radius:8px 8px 0 0;
-    white-space:nowrap; transition: all .2s; letter-spacing:.04em;
-    border-bottom: 2px solid transparent; position:relative; bottom:-1px;
-  }
-  .tab:hover { color:var(--text); background:var(--bg2); }
-  .tab.active { color:var(--accent); background:var(--bg2); border-bottom-color:var(--accent); }
-
-  /* ── CONTENT ── */
-  .content { padding:24px 32px; max-width:1100px; }
-  .section { display:none; }
-  .section.active { display:block; animation: fadeUp .35s ease; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-
-  /* ── LESSON GRID ── */
-  .lesson-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-top:20px; }
-
-  .lesson-card {
-    background:var(--card); border:1px solid var(--border); border-radius:12px;
-    padding:18px; cursor:pointer; transition: all .25s; position:relative; overflow:hidden;
-  }
-  .lesson-card::before {
-    content:''; position:absolute; inset:0;
-    background: linear-gradient(135deg, transparent 60%, rgba(99,179,237,.04));
-    pointer-events:none;
-  }
-  .lesson-card:hover { transform:translateY(-3px); border-color:rgba(99,179,237,.35); box-shadow:0 8px 32px rgba(0,0,0,.4); }
-  .lesson-card.done { border-color:rgba(16,185,129,.25); }
-  .lesson-card.done::after { content:'✓'; position:absolute; top:12px; right:12px; width:20px; height:20px; border-radius:50%; background:var(--accent3); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; line-height:20px; text-align:center; }
-  .lesson-num { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); margin-bottom:8px; letter-spacing:.08em; }
-  .lesson-title { font-size:15px; font-weight:700; margin-bottom:6px; }
-  .lesson-desc { font-size:12px; color:var(--muted); line-height:1.6; }
-  .lesson-chips { display:flex; gap:6px; margin-top:12px; flex-wrap:wrap; }
-  .chip {
-    font-size:10px; font-family:'JetBrains Mono',monospace; font-weight:600;
-    padding:3px 8px; border-radius:4px; letter-spacing:.04em;
-  }
-  .chip.blue { background:rgba(99,179,237,.12); color:var(--accent); }
-  .chip.green { background:rgba(16,185,129,.12); color:var(--accent3); }
-  .chip.amber { background:rgba(245,158,11,.12); color:var(--amber); }
-  .chip.red { background:rgba(239,68,68,.12); color:var(--red); }
-  .chip.purple { background:rgba(124,58,237,.12); color:#a78bfa; }
-
-  /* ── CODE BLOCK ── */
-  .code-wrap { background:var(--code-bg); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin:16px 0; }
-  .code-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--border); background:rgba(255,255,255,.02); }
-  .code-dots { display:flex; gap:6px; }
-  .code-dots span { width:10px; height:10px; border-radius:50%; }
-  .dot-r { background:#ef4444; } .dot-y { background:#f59e0b; } .dot-g { background:#10b981; }
-  .code-lang { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); letter-spacing:.08em; }
-  .copy-btn { font-size:10px; font-family:'JetBrains Mono',monospace; color:var(--muted); background:none; border:1px solid var(--border); padding:3px 8px; border-radius:4px; cursor:pointer; transition:all .2s; }
-  .copy-btn:hover { color:var(--accent); border-color:var(--accent); }
-  pre { padding:16px; overflow-x:auto; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.8; }
-  .kw { color:#a78bfa; } .str { color:#86efac; } .num { color:#fbbf24; }
-  .cm { color:#4b5563; font-style:italic; } .fn { color:#60a5fa; }
-  .prop { color:#f9a8d4; } .tag { color:#fb923c; }
-
-  /* ── FILE TREE ── */
-  .file-tree { background:var(--code-bg); border:1px solid var(--border); border-radius:10px; padding:16px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:2; }
-  .ft-dir { color:var(--accent); font-weight:600; }
-  .ft-file { color:var(--text); }
-  .ft-kotlin { color:#a78bfa; }
-  .ft-groovy { color:#86efac; }
-  .ft-props { color:#fbbf24; }
-  .ft-xml { color:#fb923c; }
-  .ft-dart { color:#60a5fa; }
-  .ft-indent { padding-left:20px; border-left:1px solid rgba(255,255,255,.06); margin-left:6px; }
-
-  /* ── ERROR CARDS ── */
-  .error-list { display:flex; flex-direction:column; gap:14px; margin-top:16px; }
-  .error-card { background:var(--card); border:1px solid rgba(239,68,68,.2); border-radius:12px; overflow:hidden; }
-  .error-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:rgba(239,68,68,.06); cursor:pointer; }
-  .error-title { display:flex; align-items:center; gap:10px; font-size:13px; font-weight:600; }
-  .err-icon { width:20px; height:20px; border-radius:4px; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
-  .error-body { display:none; padding:16px; border-top:1px solid rgba(239,68,68,.12); }
-  .error-body.open { display:block; animation:fadeUp .25s ease; }
-  .fix-label { font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--accent3); margin:12px 0 6px; font-weight:600; letter-spacing:.06em; }
-  .chevron { color:var(--muted); font-size:12px; transition:transform .25s; }
-  .chevron.open { transform:rotate(180deg); }
-
-  /* ── TASKS ── */
-  .task-item { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); cursor:pointer; }
-  .task-item:last-child { border-bottom:none; }
-  .task-check { width:20px; height:20px; border-radius:4px; border:1.5px solid var(--muted); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-  .task-check.done { background:var(--accent3); border-color:var(--accent3); }
-  .task-text { font-size:13px; transition:color .2s; }
-  .task-check.done + .task-text { color:var(--muted); text-decoration:line-through; }
-
-  /* ── QUIZ ── */
-  .quiz-q { font-size:14px; font-weight:600; margin-bottom:14px; line-height:1.6; }
-  .quiz-opts { display:flex; flex-direction:column; gap:8px; }
-  .quiz-opt {
-    padding:10px 14px; border:1px solid var(--border); border-radius:8px;
-    font-size:13px; cursor:pointer; transition:all .2s; font-family:'JetBrains Mono',monospace;
-  }
-  .quiz-opt:hover { border-color:var(--accent); color:var(--accent); background:rgba(99,179,237,.05); }
-  .quiz-opt.correct { border-color:var(--accent3); background:rgba(16,185,129,.08); color:var(--accent3); }
-  .quiz-opt.wrong { border-color:var(--red); background:rgba(239,68,68,.08); color:var(--red); }
-  .quiz-feedback { margin-top:12px; padding:12px; border-radius:8px; font-size:13px; display:none; }
-  .quiz-feedback.show { display:block; }
-  .quiz-feedback.ok { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2); color:var(--accent3); }
-  .quiz-feedback.bad { background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); color:var(--red); }
-
-  /* ── SECTION HEADINGS ── */
-  .sec-head { display:flex; align-items:center; gap:12px; margin-bottom:4px; }
-  .sec-head h2 { font-size:18px; font-weight:700; }
-  .sec-line { flex:1; height:1px; background:var(--border); }
-  .sec-sub { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-bottom:20px; }
-
-  /* ── INFO BOX ── */
-  .info-box { border-left:3px solid var(--accent); background:rgba(99,179,237,.06); padding:12px 16px; border-radius:0 8px 8px 0; font-size:13px; line-height:1.7; margin:16px 0; }
-  .warn-box { border-left:3px solid var(--amber); background:rgba(245,158,11,.06); padding:12px 16px; border-radius:0 8px 8px 0; font-size:13px; line-height:1.7; margin:16px 0; }
-
-  /* ── PIPELINE ── */
-  .pipeline { display:flex; align-items:center; gap:0; margin:20px 0; overflow-x:auto; padding-bottom:4px; }
-  .pipeline-step { display:flex; align-items:center; gap:0; }
-  .pipe-box { padding:8px 14px; background:var(--card); border:1px solid var(--border); border-radius:8px; font-size:11px; font-family:'JetBrains Mono',monospace; font-weight:600; white-space:nowrap; transition:all .25s; cursor:default; }
-  .pipe-box:hover { border-color:var(--accent); color:var(--accent); }
-  .pipe-arrow { color:var(--muted); font-size:14px; padding:0 8px; flex-shrink:0; }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width:4px; height:4px; }
-  ::-webkit-scrollbar-track { background:transparent; }
-  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:2px; }
-
-  .section-link { color:var(--accent); cursor:pointer; text-decoration:none; font-weight:600; }
-  .section-link:hover { text-decoration:underline; }
-</style>
+  <!-- External JavaScript file. defer means JS runs after HTML is loaded. -->
+  <script src="script.js" defer></script>
 </head>
+
 <body>
-
-<!-- HERO -->
-<div class="hero">
-  <div class="badge"><span></span>INTERACTIVE COURSE</div>
-  <h1>Flutter <span>Gradle</span><br>Zero → Hero</h1>
-  <p class="subtitle">$ ./gradlew everything --from-scratch</p>
-  <div class="hero-meta">
-    <div class="prog-ring">
-      <svg width="56" height="56" viewBox="0 0 56 56">
-        <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/>
-        <circle id="prog-circle" cx="28" cy="28" r="22" fill="none" stroke="#63b3ed" stroke-width="4" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
-      </svg>
-      <div class="prog-num" id="prog-pct">0%</div>
-    </div>
-    <div class="stat"><span class="stat-val" id="done-count">0</span><span class="stat-label">LESSONS DONE</span></div>
-    <div class="stat"><span class="stat-val">8</span><span class="stat-label">TOTAL MODULES</span></div>
-    <div class="stat"><span class="stat-val">30+</span><span class="stat-label">CODE EXAMPLES</span></div>
-    <div class="stat"><span class="stat-val">25+</span><span class="stat-label">ERRORS COVERED</span></div>
-  </div>
-</div>
-
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" onclick="showTab('overview')">📚 Overview</button>
-  <button class="tab" onclick="showTab('files')">📁 File Structure</button>
-  <button class="tab" onclick="showTab('dsl')">⚙️ Gradle DSL</button>
-  <button class="tab" onclick="showTab('deps')">📦 Dependencies</button>
-  <button class="tab" onclick="showTab('build')">🔨 Build Config</button>
-  <button class="tab" onclick="showTab('errors')">🔥 Errors & Fixes</button>
-  <button class="tab" onclick="showTab('tasks')">✅ Checklist</button>
-  <button class="tab" onclick="showTab('quiz')">🧠 Quiz</button>
-</div>
-
-<!-- CONTENT -->
-<div class="content">
-
-  <!-- ─── OVERVIEW ─── -->
-  <div class="section active" id="tab-overview">
-    <div class="sec-head"><h2>Course Modules</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Click any card to jump to that topic</p>
-    <div class="lesson-grid">
-      <div class="lesson-card" onclick="showTab('files')">
-        <div class="lesson-num">MODULE 01</div>
-        <div class="lesson-title">Project File Structure</div>
-        <div class="lesson-desc">Every Gradle file in a Flutter project — what it is, why it exists, when to touch it.</div>
-        <div class="lesson-chips"><span class="chip blue">build.gradle</span><span class="chip blue">settings</span><span class="chip blue">wrapper</span></div>
-      </div>
-      <div class="lesson-card" onclick="showTab('dsl')">
-        <div class="lesson-num">MODULE 02</div>
-        <div class="lesson-title">Gradle DSL (Groovy vs Kotlin)</div>
-        <div class="lesson-desc">Master both DSL flavors. Understand syntax, migrate Groovy → Kotlin DSL confidently.</div>
-        <div class="lesson-chips"><span class="chip purple">Kotlin DSL</span><span class="chip green">Groovy DSL</span></div>
-      </div>
-      <div class="lesson-card" onclick="showTab('deps')">
-        <div class="lesson-num">MODULE 03</div>
-        <div class="lesson-title">Dependencies & Repositories</div>
-        <div class="lesson-desc">implementation vs api vs compileOnly. Maven, Google, local .aar, BOM catalogs.</div>
-        <div class="lesson-chips"><span class="chip amber">maven</span><span class="chip green">versions</span><span class="chip blue">BOM</span></div>
-      </div>
-      <div class="lesson-card" onclick="showTab('build')">
-        <div class="lesson-num">MODULE 04</div>
-        <div class="lesson-title">Build Config & Flavors</div>
-        <div class="lesson-desc">productFlavors, buildTypes, signingConfigs, minSdk, targetSdk, compileSdk.</div>
-        <div class="lesson-chips"><span class="chip red">signing</span><span class="chip amber">flavors</span><span class="chip green">release</span></div>
-      </div>
-      <div class="lesson-card" onclick="showTab('errors')">
-        <div class="lesson-num">MODULE 05</div>
-        <div class="lesson-title">Errors & How to Fix Them</div>
-        <div class="lesson-desc">25+ real Gradle errors with step-by-step fixes. Multidex, SDK mismatches, namespace, NDK.</div>
-        <div class="lesson-chips"><span class="chip red">MultiDex</span><span class="chip red">namespace</span><span class="chip red">NDK</span></div>
-      </div>
-      <div class="lesson-card">
-        <div class="lesson-num">MODULE 06</div>
-        <div class="lesson-title">Gradle Wrapper & Versions</div>
-        <div class="lesson-desc">gradle-wrapper.properties, AGP compatibility matrix, how to upgrade safely.</div>
-        <div class="lesson-chips"><span class="chip purple">AGP 8.x</span><span class="chip blue">Gradle 8.x</span></div>
-      </div>
-      <div class="lesson-card">
-        <div class="lesson-num">MODULE 07</div>
-        <div class="lesson-title">Custom Gradle Tasks</div>
-        <div class="lesson-desc">Write your own tasks for code gen, asset copying, version bumping, CI pipelines.</div>
-        <div class="lesson-chips"><span class="chip purple">tasks</span><span class="chip green">CI/CD</span></div>
-      </div>
-      <div class="lesson-card">
-        <div class="lesson-num">MODULE 08</div>
-        <div class="lesson-title">Performance & Caching</div>
-        <div class="lesson-desc">Build caches, daemon, configuration cache, R8/ProGuard, parallel builds.</div>
-        <div class="lesson-chips"><span class="chip amber">R8</span><span class="chip green">cache</span><span class="chip blue">daemon</span></div>
-      </div>
-    </div>
-
-    <div class="info-box" style="margin-top:24px">
-      <strong>How to use this course:</strong> Work through modules in order. Each tab has code you can copy, explanations, and interactive quizzes. Track your progress with the checklist tab. The Errors tab is your debugging bible — bookmark it.
-    </div>
-
-    <h2 style="font-size:15px;margin:24px 0 12px;font-weight:700">Gradle Build Pipeline</h2>
-    <div class="pipeline">
-      <div class="pipeline-step"><div class="pipe-box">settings.gradle</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">root build.gradle</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">app/build.gradle</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">Dependency resolve</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">Compile</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">R8/ProGuard</div><div class="pipe-arrow">→</div></div>
-      <div class="pipeline-step"><div class="pipe-box">APK / AAB</div></div>
-    </div>
+  <!-- =========================
+       MODULE 1: PAGE PROGRESS
+       This small bar fills while the user scrolls.
+  ========================== -->
+  <div class="scroll-progress">
+    <div class="scroll-progress__bar" id="scrollProgressBar"></div>
   </div>
 
-  <!-- ─── FILES ─── -->
-  <div class="section" id="tab-files">
-    <div class="sec-head"><h2>Flutter Project File Structure</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Every Gradle-related file and what it does</p>
+  <!-- =========================
+       MODULE 2: BACKGROUND DECORATION
+       These are only visual animated shapes.
+  ========================== -->
+  <div class="background-grid"></div>
+  <div class="blob blob--blue"></div>
+  <div class="blob blob--purple"></div>
+  <div class="blob blob--green"></div>
 
-    <div class="file-tree">
-      <span class="ft-dir">my_flutter_app/</span><br>
-      <div class="ft-indent">
-        <span class="ft-dir">android/</span><br>
-        <div class="ft-indent">
-          <span class="ft-kotlin">build.gradle.kts</span> <span style="color:#4b5563"> ← root-level config</span><br>
-          <span class="ft-kotlin">settings.gradle.kts</span> <span style="color:#4b5563"> ← project structure</span><br>
-          <span class="ft-dir">gradle/</span><br>
-          <div class="ft-indent">
-            <span class="ft-dir">wrapper/</span><br>
-            <div class="ft-indent">
-              <span class="ft-props">gradle-wrapper.properties</span> <span style="color:#4b5563"> ← Gradle version</span><br>
-              <span class="ft-file">gradle-wrapper.jar</span> <span style="color:#4b5563"> ← bootstrap binary</span><br>
-            </div>
-            <span class="ft-props">libs.versions.toml</span> <span style="color:#4b5563"> ← version catalog (new!)</span><br>
+  <!-- =========================
+       MODULE 3: NAVBAR
+       Keep all href values matching section ids.
+  ========================== -->
+  <nav class="navbar" aria-label="Main navigation">
+    <a class="navbar__brand" href="#home" aria-label="Go to home section">
+      <span class="navbar__logo">⚙️</span>
+      <span>Flutter Gradle</span>
+    </a>
+
+    <button class="navbar__menu" id="menuButton" type="button" aria-label="Toggle menu">
+      ☰ Menu
+    </button>
+
+    <div class="navbar__links" id="navLinks">
+      <a href="#roadmap">Roadmap</a>
+      <a href="#flow">Flow</a>
+      <a href="#files">Files</a>
+      <a href="#versions">Versions</a>
+      <a href="#concepts">Concepts</a>
+      <a href="#errors">Errors</a>
+      <a href="#commands">Commands</a>
+      <a href="#quiz">Quiz</a>
+    </div>
+  </nav>
+
+  <!-- =========================
+       MODULE 4: HERO SECTION
+  ========================== -->
+  <header class="hero section" id="home">
+    <div class="container hero__grid">
+      <div class="hero__content reveal">
+        <p class="eyebrow">Beginner → Advanced Flutter Android Gradle</p>
+
+        <h1>
+          Fix Flutter Gradle issues
+          <span class="gradient-text">without guessing.</span>
+        </h1>
+
+        <p class="hero__description">
+          Learn what every Android Gradle file does, how Flutter connects with Gradle,
+          how AGP, Kotlin, JDK, repositories, dependencies, signing, and NDK fit together,
+          and how to debug real build errors step by step.
+        </p>
+
+        <div class="hero__actions">
+          <a class="button button--primary" href="#roadmap">Start Learning</a>
+          <a class="button button--secondary" href="#errors">Open Error Playbook</a>
+        </div>
+
+        <div class="hero__badges" aria-label="Learning outcomes">
+          <span>✅ File structure</span>
+          <span>✅ AGP + Gradle</span>
+          <span>✅ Real fixes</span>
+        </div>
+      </div>
+
+      <div class="terminal-card reveal reveal--delay">
+        <div class="terminal-card__top">
+          <div class="window-dots" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
-          <span class="ft-file">gradlew</span> <span style="color:#4b5563"> ← Unix build script</span><br>
-          <span class="ft-file">gradlew.bat</span> <span style="color:#4b5563"> ← Windows build script</span><br>
-          <span class="ft-props">gradle.properties</span> <span style="color:#4b5563"> ← JVM/build flags</span><br>
-          <span class="ft-props">local.properties</span> <span style="color:#4b5563"> ← SDK path (DO NOT COMMIT)</span><br>
-          <span class="ft-dir">app/</span><br>
-          <div class="ft-indent">
-            <span class="ft-kotlin">build.gradle.kts</span> <span style="color:#4b5563"> ← app module config ⭐</span><br>
-            <span class="ft-xml">src/main/AndroidManifest.xml</span><br>
-            <span class="ft-dir">src/main/kotlin/</span><br>
-            <span class="ft-dir">src/main/res/</span><br>
-          </div>
-          <span class="ft-dir">plugin_name/ (Flutter plugins)</span><br>
-          <div class="ft-indent">
-            <span class="ft-kotlin">build.gradle.kts</span> <span style="color:#4b5563"> ← plugin module config</span><br>
-          </div>
+          <span>android/app/build.gradle</span>
         </div>
-        <span class="ft-dart">lib/</span><br>
-        <span class="ft-props">pubspec.yaml</span> <span style="color:#4b5563"> ← Flutter deps (feeds into Gradle)</span><br>
-      </div>
-    </div>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">gradle-wrapper.properties</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">PROPERTIES</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="cm"># android/gradle/wrapper/gradle-wrapper.properties</span>
-<span class="prop">distributionBase</span>=<span class="str">GRADLE_USER_HOME</span>
-<span class="prop">distributionPath</span>=<span class="str">wrapper/dists</span>
-<span class="prop">zipStoreBase</span>=<span class="str">GRADLE_USER_HOME</span>
-<span class="prop">zipStorePath</span>=<span class="str">wrapper/dists</span>
-<span class="prop">distributionUrl</span>=<span class="str">https\://services.gradle.org/distributions/gradle-8.4-all.zip</span>
-<span class="cm"># Use gradle-X.X-bin.zip if you don't need sources</span></pre>
-    </div>
-
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">gradle.properties</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">PROPERTIES</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="cm"># android/gradle.properties</span>
-<span class="prop">org.gradle.jvmargs</span>=<span class="str">-Xmx4g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8</span>
-<span class="prop">org.gradle.parallel</span>=<span class="kw">true</span>
-<span class="prop">org.gradle.caching</span>=<span class="kw">true</span>
-<span class="prop">org.gradle.configureondemand</span>=<span class="kw">true</span>
-<span class="prop">android.useAndroidX</span>=<span class="kw">true</span>
-<span class="prop">android.enableJetifier</span>=<span class="kw">true</span>
-<span class="prop">kotlin.code.style</span>=<span class="str">official</span></pre>
-    </div>
-
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">local.properties</h3>
-    <div class="warn-box">⚠️ <strong>Never commit this file to Git.</strong> It contains absolute paths specific to each developer's machine. Add it to <code>.gitignore</code>.</div>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">PROPERTIES</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="cm"># android/local.properties (auto-generated, don't edit manually)</span>
-<span class="prop">sdk.dir</span>=<span class="str">/Users/yourname/Library/Android/sdk</span>
-<span class="cm"># On Windows: C\:\\Users\\yourname\\AppData\\Local\\Android\\Sdk</span></pre>
-    </div>
-  </div>
-
-  <!-- ─── DSL ─── -->
-  <div class="section" id="tab-dsl">
-    <div class="sec-head"><h2>Gradle DSL — Groovy vs Kotlin</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Flutter 3.19+ defaults to Kotlin DSL (.kts files)</p>
-
-    <div class="info-box">Kotlin DSL (`.kts`) is the modern standard. It provides type safety, IDE autocomplete, and better refactoring support. Groovy DSL (`.gradle`) is legacy but still widely used in older Flutter projects and plugins.</div>
-
-    <h3 style="margin:20px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Root build.gradle (Kotlin DSL)</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — build.gradle.kts (root)</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="cm">// android/build.gradle.kts</span>
-<span class="fn">plugins</span> {
-    <span class="cm">// Apply false = declare but don't apply to root</span>
-    id(<span class="str">"com.android.application"</span>) version <span class="str">"8.3.0"</span> apply <span class="kw">false</span>
-    id(<span class="str">"com.android.library"</span>) version <span class="str">"8.3.0"</span> apply <span class="kw">false</span>
-    id(<span class="str">"org.jetbrains.kotlin.android"</span>) version <span class="str">"1.9.22"</span> apply <span class="kw">false</span>
+        <pre class="code-block"><code>plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "dev.flutter.flutter-gradle-plugin"
 }
 
-<span class="fn">allprojects</span> {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}</pre>
-    </div>
+android {
+    namespace "com.example.myapp"
+    compileSdk flutter.compileSdkVersion
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">App build.gradle (Kotlin DSL)</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — android/app/build.gradle.kts</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="fn">plugins</span> {
-    id(<span class="str">"com.android.application"</span>)
-    id(<span class="str">"org.jetbrains.kotlin.android"</span>)
-    id(<span class="str">"dev.flutter.flutter-gradle-plugin"</span>)
-}
-
-<span class="fn">android</span> {
-    <span class="prop">namespace</span> = <span class="str">"com.example.my_flutter_app"</span>
-    <span class="prop">compileSdk</span> = <span class="fn">flutter</span>.compileSdkVersion
-    <span class="prop">ndkVersion</span> = <span class="fn">flutter</span>.ndkVersion
-
-    <span class="fn">defaultConfig</span> {
-        <span class="prop">applicationId</span> = <span class="str">"com.example.my_flutter_app"</span>
-        <span class="prop">minSdk</span> = <span class="fn">flutter</span>.minSdkVersion
-        <span class="prop">targetSdk</span> = <span class="fn">flutter</span>.targetSdkVersion
-        <span class="prop">versionCode</span> = <span class="fn">flutter</span>.versionCode
-        <span class="prop">versionName</span> = <span class="fn">flutter</span>.versionName
-        <span class="prop">multiDexEnabled</span> = <span class="kw">true</span>
-    }
-
-    <span class="fn">buildTypes</span> {
-        <span class="fn">release</span> {
-            <span class="prop">isMinifyEnabled</span> = <span class="kw">true</span>
-            <span class="prop">isShrinkResources</span> = <span class="kw">true</span>
-            <span class="fn">proguardFiles</span>(
-                getDefaultProguardFile(<span class="str">"proguard-android-optimize.txt"</span>),
-                <span class="str">"proguard-rules.pro"</span>
-            )
-            <span class="fn">signingConfig</span> = signingConfigs.getByName(<span class="str">"release"</span>)
-        }
-        <span class="fn">debug</span> {
-            <span class="prop">applicationIdSuffix</span> = <span class="str">".debug"</span>
-        }
-    }
-
-    <span class="fn">compileOptions</span> {
-        <span class="prop">sourceCompatibility</span> = JavaVersion.VERSION_17
-        <span class="prop">targetCompatibility</span> = JavaVersion.VERSION_17
-    }
-
-    <span class="fn">kotlinOptions</span> {
-        <span class="prop">jvmTarget</span> = <span class="str">"17"</span>
+    defaultConfig {
+        applicationId "com.example.myapp"
+        minSdk flutter.minSdkVersion
+        targetSdk flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 }
 
-<span class="fn">flutter</span> {
-    <span class="prop">source</span> = <span class="str">"../.."</span>
-}
-
-<span class="fn">dependencies</span> {
-    implementation(<span class="str">"androidx.multidex:multidex:2.0.1"</span>)
-}</pre>
+flutter {
+    source "../.."
+}</code></pre>
+      </div>
     </div>
+  </header>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--amber)">Same in Groovy DSL (legacy)</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">GROOVY — android/app/build.gradle</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 5: ROADMAP SECTION
+  ========================== -->
+  <section class="section" id="roadmap">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Learning Roadmap</p>
+        <h2>Learn Gradle in the right order.</h2>
+        <p>
+          Do not start by memorizing errors. First understand the build system layers.
+          Then every error will tell you which layer is broken.
+        </p>
       </div>
-      <pre><span class="fn">plugins</span> {
-    id <span class="str">'com.android.application'</span>
-    id <span class="str">'kotlin-android'</span>
-}
 
-<span class="fn">android</span> {
-    <span class="prop">namespace</span> <span class="str">'com.example.my_flutter_app'</span>
-    <span class="prop">compileSdkVersion</span> flutter.compileSdkVersion
+      <div class="card-grid card-grid--four">
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">01</span>
+          <h3>Flutter project root</h3>
+          <p>Dart code, pubspec.yaml, assets, and platform folders live here.</p>
+        </article>
 
-    <span class="fn">defaultConfig</span> {
-        <span class="prop">applicationId</span> <span class="str">"com.example.my_flutter_app"</span>
-        <span class="prop">minSdkVersion</span> flutter.minSdkVersion
-        <span class="prop">targetSdkVersion</span> flutter.targetSdkVersion
-        <span class="prop">versionCode</span> flutter.versionCode
-        <span class="prop">versionName</span> flutter.versionName
-        <span class="prop">multiDexEnabled</span> <span class="kw">true</span>
-    }
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">02</span>
+          <h3>Android folder</h3>
+          <p>This is a real Android project inside your Flutter project.</p>
+        </article>
 
-    <span class="fn">buildTypes</span> {
-        release {
-            <span class="prop">minifyEnabled</span> <span class="kw">true</span>
-            <span class="prop">shrinkResources</span> <span class="kw">true</span>
-            <span class="fn">proguardFiles</span> getDefaultProguardFile(<span class="str">'proguard-android-optimize.txt'</span>), <span class="str">'proguard-rules.pro'</span>
-        }
-    }
-}
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">03</span>
+          <h3>Gradle wrapper</h3>
+          <p>Locks the Gradle version used by this project.</p>
+        </article>
 
-<span class="fn">flutter</span> {
-    <span class="prop">source</span> <span class="str">'../..'</span>
-}
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">04</span>
+          <h3>AGP</h3>
+          <p>Android Gradle Plugin adds Android build tasks to Gradle.</p>
+        </article>
 
-<span class="fn">dependencies</span> {
-    implementation <span class="str">'androidx.multidex:multidex:2.0.1'</span>
-}</pre>
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">05</span>
+          <h3>Kotlin plugin</h3>
+          <p>Compiles Kotlin code used by Android plugins and native code.</p>
+        </article>
+
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">06</span>
+          <h3>Repositories</h3>
+          <p>Gradle downloads plugins and libraries from configured repositories.</p>
+        </article>
+
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">07</span>
+          <h3>Dependencies</h3>
+          <p>Libraries used by your app, Android plugins, tests, or build tools.</p>
+        </article>
+
+        <article class="glass-card learning-card reveal">
+          <span class="card-number">08</span>
+          <h3>Debugging</h3>
+          <p>Read the first real error, identify the layer, then fix carefully.</p>
+        </article>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">settings.gradle.kts</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — android/settings.gradle.kts</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 6: BUILD FLOW SECTION
+  ========================== -->
+  <section class="section section--compact" id="flow">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Build Flow</p>
+        <h2>What happens when you run <span class="gradient-text">flutter build apk</span>?</h2>
+        <p>
+          Flutter handles Dart and framework work, then calls Android Gradle to produce APK or AAB.
+        </p>
       </div>
-      <pre><span class="fn">pluginManagement</span> {
-    <span class="fn">includeBuild</span>(<span class="str">"../build-logic"</span>)
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
 
-<span class="fn">plugins</span> {
-    id(<span class="str">"dev.flutter.flutter-plugin-loader"</span>) version <span class="str">"1.0.0"</span>
-    id(<span class="str">"com.android.application"</span>) version <span class="str">"8.3.0"</span> apply <span class="kw">false</span>
-    id(<span class="str">"org.jetbrains.kotlin.android"</span>) version <span class="str">"1.9.22"</span> apply <span class="kw">false</span>
-}
+      <div class="flow glass-card reveal" aria-label="Flutter Android build flow">
+        <div class="flow__step">
+          <strong>1</strong>
+          <h3>Flutter command</h3>
+          <p>You run <code>flutter run</code>, <code>flutter build apk</code>, or <code>flutter build appbundle</code>.</p>
+        </div>
 
-<span class="fn">include</span>(<span class="str">":app"</span>)</pre>
+        <div class="flow__arrow">→</div>
+
+        <div class="flow__step">
+          <strong>2</strong>
+          <h3>Gradle wrapper</h3>
+          <p>Flutter calls <code>android/gradlew</code>, so your project Gradle version is used.</p>
+        </div>
+
+        <div class="flow__arrow">→</div>
+
+        <div class="flow__step">
+          <strong>3</strong>
+          <h3>Settings file</h3>
+          <p><code>settings.gradle</code> loads plugin repositories and includes the app module.</p>
+        </div>
+
+        <div class="flow__arrow">→</div>
+
+        <div class="flow__step">
+          <strong>4</strong>
+          <h3>AGP tasks</h3>
+          <p>AGP creates tasks like compile, merge resources, package, and assemble.</p>
+        </div>
+
+        <div class="flow__arrow">→</div>
+
+        <div class="flow__step">
+          <strong>5</strong>
+          <h3>Output</h3>
+          <p>APK/AAB appears in <code>build/app/outputs</code>.</p>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── DEPS ─── -->
-  <div class="section" id="tab-deps">
-    <div class="sec-head"><h2>Dependencies & Repositories</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Know which keyword to use and where to get packages</p>
+  <!-- =========================
+       MODULE 7: FILE EXPLORER SECTION
+       The right side is filled by script.js.
+  ========================== -->
+  <section class="section" id="files">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">File Structure</p>
+        <h2>Important Android Gradle files in Flutter.</h2>
+        <p>
+          Click each file. You will see its purpose, what to edit, what not to edit, and a sample snippet.
+        </p>
+      </div>
 
-    <div class="info-box">
-      <strong>Dependency configurations explained:</strong><br>
-      <code>implementation</code> — available only in this module (most common)<br>
-      <code>api</code> — exposed to dependent modules (use sparingly)<br>
-      <code>compileOnly</code> — compile-time only, not bundled<br>
-      <code>runtimeOnly</code> — not available at compile time<br>
-      <code>testImplementation</code> — only for unit tests<br>
-      <code>androidTestImplementation</code> — only for instrumented tests
+      <div class="file-explorer reveal">
+        <aside class="file-explorer__sidebar glass-card" aria-label="Gradle files">
+          <button class="file-button active" type="button" data-file="settings">android/settings.gradle</button>
+          <button class="file-button" type="button" data-file="rootBuild">android/build.gradle</button>
+          <button class="file-button" type="button" data-file="appBuild">android/app/build.gradle</button>
+          <button class="file-button" type="button" data-file="wrapper">gradle-wrapper.properties</button>
+          <button class="file-button" type="button" data-file="gradleProperties">android/gradle.properties</button>
+          <button class="file-button" type="button" data-file="localProperties">android/local.properties</button>
+          <button class="file-button" type="button" data-file="manifest">AndroidManifest.xml</button>
+          <button class="file-button" type="button" data-file="keyProperties">key.properties</button>
+        </aside>
+
+        <article class="file-explorer__content glass-card" id="fileDetails">
+          <!-- File details will be rendered by JavaScript. -->
+        </article>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:20px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Common Flutter Dependencies</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — dependencies block</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 8: VERSION COMPATIBILITY SECTION
+  ========================== -->
+  <section class="section section--compact" id="versions">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Version Compatibility</p>
+        <h2>Gradle issues are mostly version mismatch issues.</h2>
+        <p>
+          Flutter, Gradle wrapper, AGP, Kotlin plugin, JDK, compileSdk, and dependencies must fit together.
+          Do not blindly paste random versions from the internet.
+        </p>
       </div>
-      <pre><span class="fn">dependencies</span> {
-    <span class="cm">// MultiDex (required if minSdk < 21)</span>
-    implementation(<span class="str">"androidx.multidex:multidex:2.0.1"</span>)
 
-    <span class="cm">// Firebase BOM (manages all Firebase versions)</span>
-    implementation(platform(<span class="str">"com.google.firebase:firebase-bom:32.7.0"</span>))
-    implementation(<span class="str">"com.google.firebase:firebase-analytics"</span>)
-    implementation(<span class="str">"com.google.firebase:firebase-crashlytics"</span>)
+      <div class="glass-card table-card reveal">
+        <div class="table-card__note">
+          <strong>Safe rule:</strong>
+          use the versions generated by your current <code>flutter create</code> template first.
+          Then upgrade one layer at a time.
+        </div>
 
-    <span class="cm">// Local .aar file</span>
-    implementation(files(<span class="str">"libs/my_sdk.aar"</span>))
-    <span class="cm">// All .aar files in folder</span>
-    implementation(fileTree(<span class="fn">mapOf</span>(<span class="str">"dir"</span> to <span class="str">"libs"</span>, <span class="str">"include"</span> to <span class="fn">listOf</span>(<span class="str">"*.aar"</span>, <span class="str">"*.jar"</span>))))
-
-    <span class="cm">// Test dependencies</span>
-    testImplementation(<span class="str">"junit:junit:4.13.2"</span>)
-    androidTestImplementation(<span class="str">"androidx.test.espresso:espresso-core:3.5.1"</span>)
-}</pre>
+        <div class="responsive-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Where you see it</th>
+                <th>Common problem</th>
+                <th>Better fix</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gradle wrapper</td>
+                <td>gradle-wrapper.properties</td>
+                <td>AGP needs a newer Gradle version.</td>
+                <td>Update wrapper based on AGP official compatibility.</td>
+              </tr>
+              <tr>
+                <td>AGP</td>
+                <td>settings.gradle plugins block</td>
+                <td>Old AGP cannot handle new SDK or namespace rules.</td>
+                <td>Upgrade with Android Studio Upgrade Assistant or fresh Flutter template comparison.</td>
+              </tr>
+              <tr>
+                <td>Kotlin</td>
+                <td>settings.gradle or build.gradle</td>
+                <td>Binary metadata version mismatch.</td>
+                <td>Update Kotlin plugin, but keep it compatible with AGP and Gradle.</td>
+              </tr>
+              <tr>
+                <td>JDK</td>
+                <td>Android Studio Gradle JDK / flutter doctor -v</td>
+                <td>Unsupported class file major version.</td>
+                <td>Use the JDK expected by your AGP/Gradle setup, commonly JDK 17 for modern AGP.</td>
+              </tr>
+              <tr>
+                <td>compileSdk</td>
+                <td>android/app/build.gradle</td>
+                <td>Dependency requires newer Android API.</td>
+                <td>Increase compileSdk safely; it does not directly increase minimum device support.</td>
+              </tr>
+              <tr>
+                <td>minSdk</td>
+                <td>android/app/build.gradle</td>
+                <td>Plugin needs a higher minimum Android version.</td>
+                <td>Increase minSdk only if you accept dropping older devices.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Version Catalog (libs.versions.toml)</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">TOML — gradle/libs.versions.toml</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 9: CORE CONCEPTS SECTION
+  ========================== -->
+  <section class="section" id="concepts">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Core Concepts</p>
+        <h2>Terms you must understand.</h2>
+        <p>These are the words you will see repeatedly in Flutter Android build errors.</p>
       </div>
-      <pre><span class="cm"># Declare all versions in one place</span>
-[<span class="kw">versions</span>]
-<span class="prop">agp</span> = <span class="str">"8.3.0"</span>
-<span class="prop">kotlin</span> = <span class="str">"1.9.22"</span>
-<span class="prop">multidex</span> = <span class="str">"2.0.1"</span>
-<span class="prop">firebase-bom</span> = <span class="str">"32.7.0"</span>
 
-[<span class="kw">libraries</span>]
-<span class="prop">multidex</span> = { group = <span class="str">"androidx.multidex"</span>, name = <span class="str">"multidex"</span>, version.ref = <span class="str">"multidex"</span> }
-<span class="prop">firebase-bom</span> = { group = <span class="str">"com.google.firebase"</span>, name = <span class="str">"firebase-bom"</span>, version.ref = <span class="str">"firebase-bom"</span> }
+      <div class="card-grid card-grid--three">
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Gradle</span>
+          <h3>Build automation tool</h3>
+          <p>Gradle runs tasks like compile code, merge resources, run tests, and package APK/AAB.</p>
+        </article>
 
-[<span class="kw">plugins</span>]
-<span class="prop">android-application</span> = { id = <span class="str">"com.android.application"</span>, version.ref = <span class="str">"agp"</span> }
-<span class="prop">kotlin-android</span> = { id = <span class="str">"org.jetbrains.kotlin.android"</span>, version.ref = <span class="str">"kotlin"</span> }
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">AGP</span>
+          <h3>Android Gradle Plugin</h3>
+          <p>AGP adds Android-specific behavior to Gradle. Without AGP, Gradle does not know Android app rules.</p>
+        </article>
 
-<span class="cm"># Usage in build.gradle.kts:</span>
-<span class="cm"># dependencies { implementation(libs.multidex) }</span></pre>
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Plugin DSL</span>
+          <h3>Modern plugin syntax</h3>
+          <p>The <code>plugins {}</code> block is cleaner than old <code>apply from</code> style.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Repository</span>
+          <h3>Download source</h3>
+          <p><code>google()</code>, <code>mavenCentral()</code>, and <code>gradlePluginPortal()</code> tell Gradle where to download things.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Dependency</span>
+          <h3>External library</h3>
+          <p>Dependencies can be app libraries, test libraries, or transitive libraries coming from other libraries.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Namespace</span>
+          <h3>Android code package</h3>
+          <p>Modern Android projects require <code>namespace</code> inside the <code>android {}</code> block.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Build type</span>
+          <h3>debug / release</h3>
+          <p>Debug is for development. Release is for Play Store or production builds.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">Flavor</span>
+          <h3>staging / production</h3>
+          <p>Flavors allow different app names, API URLs, icons, or package IDs from the same codebase.</p>
+        </article>
+
+        <article class="glass-card concept-card reveal">
+          <span class="mini-label">NDK</span>
+          <h3>Native toolchain</h3>
+          <p>NDK is needed when plugins or your app use native C/C++ libraries.</p>
+        </article>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Repositories Configuration</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — repositories block</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 10: ERROR PLAYBOOK SECTION
+       Error cards are rendered by script.js.
+  ========================== -->
+  <section class="section section--compact" id="errors">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Error Playbook</p>
+        <h2>Search common Gradle errors.</h2>
+        <p>
+          Type words from your error. Example: <code>namespace</code>, <code>kotlin</code>, <code>duplicate</code>, <code>minSdk</code>, <code>java</code>.
+        </p>
       </div>
-      <pre><span class="fn">repositories</span> {
-    google()            <span class="cm">// Android artifacts, Firebase</span>
-    mavenCentral()      <span class="cm">// Most open-source libraries</span>
-    gradlePluginPortal() <span class="cm">// Gradle plugins only</span>
 
-    <span class="cm">// Private Maven repo (e.g. JFrog, Nexus)</span>
-    maven {
-        url = uri(<span class="str">"https://your-company.jfrog.io/artifactory/libs-release"</span>)
-        credentials {
-            username = providers.gradleProperty(<span class="str">"NEXUS_USER"</span>).get()
-            password = providers.gradleProperty(<span class="str">"NEXUS_PASS"</span>).get()
-        }
-    }
+      <div class="glass-card error-panel reveal">
+        <label class="search-box" for="errorSearchInput">
+          <span>🔎</span>
+          <input id="errorSearchInput" type="search" placeholder="Search error keyword..." />
+        </label>
 
-    <span class="cm">// JitPack for GitHub repos</span>
-    maven { url = uri(<span class="str">"https://jitpack.io"</span>) }
-}</pre>
+        <div class="error-list" id="errorList">
+          <!-- Error cards will be rendered by JavaScript. -->
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- ─── BUILD CONFIG ─── -->
-  <div class="section" id="tab-build">
-    <div class="sec-head"><h2>Build Config, Flavors & Signing</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Release builds, product flavors, signing configs</p>
-
-    <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Product Flavors</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — productFlavors</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 11: COMMAND CENTER SECTION
+  ========================== -->
+  <section class="section" id="commands">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Command Center</p>
+        <h2>Commands for real debugging.</h2>
+        <p>Use these before changing random Gradle versions.</p>
       </div>
-      <pre><span class="fn">android</span> {
-    <span class="fn">flavorDimensions</span> += <span class="fn">listOf</span>(<span class="str">"environment"</span>)
 
-    <span class="fn">productFlavors</span> {
-        create(<span class="str">"dev"</span>) {
-            <span class="prop">dimension</span> = <span class="str">"environment"</span>
-            <span class="prop">applicationIdSuffix</span> = <span class="str">".dev"</span>
-            <span class="prop">versionNameSuffix</span> = <span class="str">"-dev"</span>
-            <span class="fn">buildConfigField</span>(<span class="str">"String"</span>, <span class="str">"BASE_URL"</span>, <span class="str">'"https://dev-api.example.com"'</span>)
-        }
-        create(<span class="str">"staging"</span>) {
-            <span class="prop">dimension</span> = <span class="str">"environment"</span>
-            <span class="prop">applicationIdSuffix</span> = <span class="str">".staging"</span>
-            <span class="fn">buildConfigField</span>(<span class="str">"String"</span>, <span class="str">"BASE_URL"</span>, <span class="str">'"https://staging-api.example.com"'</span>)
-        }
-        create(<span class="str">"prod"</span>) {
-            <span class="prop">dimension</span> = <span class="str">"environment"</span>
-            <span class="fn">buildConfigField</span>(<span class="str">"String"</span>, <span class="str">"BASE_URL"</span>, <span class="str">'"https://api.example.com"'</span>)
-        }
-    }
-    <span class="cm">// Generates tasks: assembleProdRelease, assembleDevDebug, etc.</span>
-}</pre>
+      <div class="card-grid card-grid--two">
+        <article class="glass-card command-card reveal">
+          <h3>Check Flutter + Android + Java</h3>
+          <p>This shows Flutter SDK, Android SDK, Java path, and connected devices.</p>
+          <pre class="code-block"><code>flutter doctor -v</code></pre>
+        </article>
+
+        <article class="glass-card command-card reveal">
+          <h3>Check project Gradle version</h3>
+          <p>This uses your project Gradle wrapper, not global Gradle.</p>
+          <pre class="code-block"><code>cd android
+./gradlew -v</code></pre>
+        </article>
+
+        <article class="glass-card command-card reveal">
+          <h3>Build with detailed stacktrace</h3>
+          <p>Use this when Flutter output hides the detailed Gradle reason.</p>
+          <pre class="code-block"><code>cd android
+./gradlew assembleDebug --stacktrace</code></pre>
+        </article>
+
+        <article class="glass-card command-card reveal">
+          <h3>Inspect dependency tree</h3>
+          <p>Useful for duplicate class and transitive dependency problems.</p>
+          <pre class="code-block"><code>cd android
+./gradlew :app:dependencies</code></pre>
+        </article>
+
+        <article class="glass-card command-card reveal">
+          <h3>Stop daemon and clean safely</h3>
+          <p>Use after changing Gradle, AGP, Kotlin, or JDK versions.</p>
+          <pre class="code-block"><code>cd android
+./gradlew --stop
+cd ..
+flutter clean
+flutter pub get</code></pre>
+        </article>
+
+        <article class="glass-card command-card reveal">
+          <h3>Build release APK or AAB</h3>
+          <p>Use APK for testing and AAB for Play Store upload.</p>
+          <pre class="code-block"><code>flutter build apk --release
+flutter build appbundle --release</code></pre>
+        </article>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Signing Config (secure approach)</h3>
-    <div class="warn-box">⚠️ <strong>Never hardcode keystore passwords in build.gradle.</strong> Use environment variables or a local keystore.properties file (gitignored).</div>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">KOTLIN DSL — signingConfigs</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 12: DEBUG CHECKLIST SECTION
+  ========================== -->
+  <section class="section section--compact" id="checklist">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Debug Checklist</p>
+        <h2>Follow this order when Gradle fails.</h2>
       </div>
-      <pre><span class="cm">// Read keystore.properties (gitignored)</span>
-<span class="kw">val</span> keystorePropsFile = rootProject.file(<span class="str">"keystore.properties"</span>)
-<span class="kw">val</span> keystoreProps = Properties()
-<span class="kw">if</span> (keystorePropsFile.exists()) {
-    keystoreProps.load(keystorePropsFile.inputStream())
-}
 
-<span class="fn">android</span> {
-    <span class="fn">signingConfigs</span> {
-        create(<span class="str">"release"</span>) {
-            <span class="prop">storeFile</span> = file(keystoreProps[<span class="str">"storeFile"</span>] as String)
-            <span class="prop">storePassword</span> = keystoreProps[<span class="str">"storePassword"</span>] as String
-            <span class="prop">keyAlias</span> = keystoreProps[<span class="str">"keyAlias"</span>] as String
-            <span class="prop">keyPassword</span> = keystoreProps[<span class="str">"keyPassword"</span>] as String
-        }
-    }
-
-    <span class="fn">buildTypes</span> {
-        <span class="fn">release</span> {
-            <span class="fn">signingConfig</span> = signingConfigs.getByName(<span class="str">"release"</span>)
-            <span class="prop">isMinifyEnabled</span> = <span class="kw">true</span>
-            <span class="prop">isShrinkResources</span> = <span class="kw">true</span>
-        }
-    }
-}</pre>
+      <div class="glass-card checklist reveal">
+        <label><input type="checkbox" /> <span>Read the first real error line, not only the final failure summary.</span></label>
+        <label><input type="checkbox" /> <span>Find the broken layer: Flutter, Gradle, AGP, Kotlin, JDK, SDK, dependency, manifest, or resource.</span></label>
+        <label><input type="checkbox" /> <span>Compare your Android folder with a fresh app from your current Flutter SDK.</span></label>
+        <label><input type="checkbox" /> <span>Check AGP and Gradle compatibility before changing wrapper versions.</span></label>
+        <label><input type="checkbox" /> <span>Upgrade one thing at a time and test after every change.</span></label>
+        <label><input type="checkbox" /> <span>Clean cache only after fixing the real cause.</span></label>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">keystore.properties</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">PROPERTIES — (root)/keystore.properties [.gitignore this!]</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
+  <!-- =========================
+       MODULE 13: QUIZ SECTION
+  ========================== -->
+  <section class="section" id="quiz">
+    <div class="container">
+      <div class="section-heading reveal">
+        <p class="eyebrow">Quick Quiz</p>
+        <h2>Check your understanding.</h2>
       </div>
-      <pre><span class="prop">storeFile</span>=<span class="str">../keystore/release.jks</span>
-<span class="prop">storePassword</span>=<span class="str">your_store_password</span>
-<span class="prop">keyAlias</span>=<span class="str">release_key</span>
-<span class="prop">keyPassword</span>=<span class="str">your_key_password</span></pre>
+
+      <div class="quiz glass-card reveal">
+        <h3 id="quizQuestion">Question will appear here.</h3>
+        <div class="quiz__options" id="quizOptions"></div>
+        <p class="quiz__feedback" id="quizFeedback"></p>
+
+        <div class="quiz__actions">
+          <button class="button button--primary" type="button" id="nextQuestionButton">Next Question</button>
+          <button class="button button--secondary" type="button" id="resetQuizButton">Reset Quiz</button>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <h3 style="margin:24px 0 10px;font-size:14px;font-weight:700;color:var(--accent)">Build Commands Reference</h3>
-    <div class="code-wrap">
-      <div class="code-header">
-        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
-        <span class="code-lang">BASH — common Flutter Gradle commands</span>
-        <button class="copy-btn" onclick="copyCode(this)">copy</button>
-      </div>
-      <pre><span class="cm"># Run app</span>
-flutter run
-
-<span class="cm"># Build debug APK</span>
-flutter build apk --debug
-
-<span class="cm"># Build release APK</span>
-flutter build apk --release
-
-<span class="cm"># Build App Bundle (required for Play Store)</span>
-flutter build appbundle --release
-
-<span class="cm"># Build specific flavor</span>
-flutter build apk --flavor prod --release
-
-<span class="cm"># Clean build cache</span>
-flutter clean && cd android && ./gradlew clean
-
-<span class="cm"># List all Gradle tasks</span>
-cd android && ./gradlew tasks --all
-
-<span class="cm"># Check dependency tree</span>
-cd android && ./gradlew app:dependencies
-
-<span class="cm"># Build with verbose logging</span>
-cd android && ./gradlew assembleRelease --stacktrace --info</pre>
+  <!-- =========================
+       MODULE 14: FOOTER
+  ========================== -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        Practical rule: Gradle errors are not magic. Read the real error, identify the broken layer,
+        check compatibility, then apply the smallest correct fix.
+      </p>
     </div>
-  </div>
-
-  <!-- ─── ERRORS ─── -->
-  <div class="section" id="tab-errors">
-    <div class="sec-head"><h2>Errors & How to Fix Them</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// 25+ real-world Gradle errors with step-by-step solutions</p>
-
-    <div class="error-list">
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Namespace not specified</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Namespace not specified. Specify a namespace in the module's build file.</pre></div>
-          <div class="fix-label">// FIX — add namespace to android {} block</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">KOTLIN DSL</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="fn">android</span> {
-    <span class="prop">namespace</span> = <span class="str">"com.example.myapp"</span>  <span class="cm">// ← add this</span>
-    <span class="prop">compileSdk</span> = <span class="num">34</span>
-    ...
-}</pre></div>
-          <div class="info-box" style="margin:8px 0 0">In older Groovy DSL: <code>namespace 'com.example.myapp'</code>. Required since AGP 7.3+. Also remove <code>package</code> attribute from <code>AndroidManifest.xml</code> if present.</div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>minSdkVersion too low for dependency</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">uses-sdk:minSdkVersion X cannot be smaller than version Y declared in library</pre></div>
-          <div class="fix-label">// FIX — increase minSdk in defaultConfig</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">KOTLIN DSL</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="fn">defaultConfig</span> {
-    <span class="prop">minSdk</span> = <span class="num">21</span>  <span class="cm">// ← bump to meet library requirement</span>
-    <span class="cm">// OR override in manifest (not recommended):</span>
-    <span class="cm">// tools:overrideLibrary="com.example.library"</span>
-}</pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Cannot resolve symbol / dependency not found</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Could not resolve com.example:library:1.0.0
-No cached version available for offline mode</pre></div>
-          <div class="fix-label">// FIX — check repo, clear cache, force refresh</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">BASH</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="cm"># Force refresh dependencies</span>
-./gradlew build --refresh-dependencies
-
-<span class="cm"># Clear Gradle cache</span>
-rm -rf ~/.gradle/caches/
-<span class="cm"># On Windows: del /s /q %USERPROFILE%\.gradle\caches\</span>
-
-<span class="cm"># Also ensure repository is declared:</span>
-<span class="cm"># repositories { google(); mavenCentral() }</span></pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Multidex — too many methods (> 64K)</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Cannot fit requested classes in a single dex file.
-method count: 72384 > 65536</pre></div>
-          <div class="fix-label">// FIX — enable multiDex</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">KOTLIN DSL</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="fn">defaultConfig</span> {
-    <span class="prop">multiDexEnabled</span> = <span class="kw">true</span>
-}
-<span class="fn">dependencies</span> {
-    <span class="cm">// Only if minSdk < 21</span>
-    implementation(<span class="str">"androidx.multidex:multidex:2.0.1"</span>)
-}</pre></div>
-          <div class="info-box" style="margin:8px 0 0">If <code>minSdk ≥ 21</code>, multidex is automatic — just set <code>multiDexEnabled = true</code>, no library needed.</div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>AGP / Gradle version incompatibility</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Android Gradle plugin requires Java 17 to run.
-Minimum supported Gradle version is 8.0. Current version is 7.6.</pre></div>
-          <div class="fix-label">// FIX — use the AGP compatibility matrix</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">COMPATIBILITY TABLE</span></div>
-          <pre><span class="cm">AGP 8.3  → Gradle 8.4+  → Java 17+</span>
-<span class="cm">AGP 8.2  → Gradle 8.2+  → Java 17+</span>
-<span class="cm">AGP 8.0  → Gradle 8.0+  → Java 17+</span>
-<span class="cm">AGP 7.4  → Gradle 7.5+  → Java 11+</span>
-
-<span class="cm"># gradle-wrapper.properties:</span>
-<span class="prop">distributionUrl</span>=<span class="str">https\://services.gradle.org/distributions/gradle-8.4-all.zip</span>
-
-<span class="cm"># settings.gradle.kts / root build.gradle.kts:</span>
-id(<span class="str">"com.android.application"</span>) version <span class="str">"8.3.0"</span></pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>NDK version mismatch</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">No version of NDK matched the requested version 21.4.7075529.
-Requested by: project ':app'</pre></div>
-          <div class="fix-label">// FIX — pin NDK version or install required version</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">KOTLIN DSL</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="fn">android</span> {
-    <span class="cm">// Pin to installed NDK version</span>
-    <span class="prop">ndkVersion</span> = <span class="str">"25.1.8937393"</span>
-    <span class="cm">// OR use Flutter's recommended version:</span>
-    <span class="prop">ndkVersion</span> = flutter.ndkVersion
-}</pre></div>
-          <div class="info-box" style="margin:8px 0 0">Install the NDK via: Android Studio → SDK Manager → SDK Tools → NDK. Or: <code>sdkmanager "ndk;25.1.8937393"</code></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Duplicate class error</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Duplicate class kotlin.collections.jdk8.CollectionsJDK8Kt found in modules
-kotlin-stdlib-jdk8 and kotlin-stdlib</pre></div>
-          <div class="fix-label">// FIX — exclude or force resolve</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">KOTLIN DSL</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="fn">dependencies</span> {
-    <span class="cm">// Force consistent Kotlin stdlib version</span>
-    constraints {
-        implementation(<span class="str">"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"</span>) {
-            because(<span class="str">"kotlin-stdlib-jdk7 is now part of kotlin-stdlib"</span>)
-        }
-        implementation(<span class="str">"org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22"</span>) {
-            because(<span class="str">"kotlin-stdlib-jdk8 is now part of kotlin-stdlib"</span>)
-        }
-    }
-}</pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Jetifier / AndroidX conflict</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Cannot access class 'android.support.v4.app.Fragment'.
-Check your module classpath for missing or conflicting dependencies.</pre></div>
-          <div class="fix-label">// FIX — enable Jetifier in gradle.properties</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">PROPERTIES</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="cm"># gradle.properties</span>
-<span class="prop">android.useAndroidX</span>=<span class="kw">true</span>
-<span class="prop">android.enableJetifier</span>=<span class="kw">true</span>
-
-<span class="cm"># Then run:</span>
-<span class="cm"># flutter pub run jetifier:migrate</span></pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Out of Memory / Gradle Heap</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">java.lang.OutOfMemoryError: GC overhead limit exceeded
-Java heap space</pre></div>
-          <div class="fix-label">// FIX — increase JVM heap in gradle.properties</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">PROPERTIES</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre><span class="cm"># gradle.properties</span>
-<span class="prop">org.gradle.jvmargs</span>=<span class="str">-Xmx4g -Xms512m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError</span>
-<span class="prop">org.gradle.daemon</span>=<span class="kw">true</span>
-<span class="prop">org.gradle.parallel</span>=<span class="kw">true</span>
-<span class="prop">org.gradle.caching</span>=<span class="kw">true</span></pre></div>
-        </div>
-      </div>
-
-      <div class="error-card">
-        <div class="error-header" onclick="toggleError(this)">
-          <div class="error-title"><div class="err-icon">E</div>Flutter plugin doesn't compile (plugin Groovy vs Kotlin)</div>
-          <span class="chevron">▼</span>
-        </div>
-        <div class="error-body">
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">ERROR MESSAGE</span></div>
-          <pre style="color:var(--red)">Could not find method android() for arguments [plugin_build_gradle]
-Script compilation errors in plugin build.gradle.kts</pre></div>
-          <div class="fix-label">// FIX — check plugin build.gradle for required fields</div>
-          <div class="code-wrap"><div class="code-header"><div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div><span class="code-lang">GROOVY — minimal plugin build.gradle</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-          <pre>group <span class="str">'com.example.plugin'</span>
-version <span class="str">'1.0'</span>
-
-<span class="fn">buildscript</span> {
-    repositories { google(); mavenCentral() }
-    dependencies {
-        classpath <span class="str">"com.android.tools.build:gradle:8.3.0"</span>
-    }
-}
-
-apply plugin: <span class="str">'com.android.library'</span>
-
-<span class="fn">android</span> {
-    <span class="prop">namespace</span> <span class="str">'com.example.plugin'</span>
-    <span class="prop">compileSdkVersion</span> <span class="num">34</span>
-    defaultConfig { <span class="prop">minSdkVersion</span> <span class="num">16</span> }
-}</pre></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ─── TASKS / CHECKLIST ─── -->
-  <div class="section" id="tab-tasks">
-    <div class="sec-head"><h2>Flutter Gradle Mastery Checklist</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// Check off each item as you learn it</p>
-
-    <div id="checklist">
-      <h3 style="font-size:13px;font-weight:700;color:var(--muted);margin:0 0 8px;letter-spacing:.06em">FOUNDATION</h3>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Understand the difference between build.gradle (root) and app/build.gradle</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Know what gradle-wrapper.properties does and how to change Gradle version</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Understand gradle.properties JVM flags and performance settings</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Know why local.properties must be gitignored</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Run ./gradlew tasks --all and understand what you see</span></div>
-
-      <h3 style="font-size:13px;font-weight:700;color:var(--muted);margin:20px 0 8px;letter-spacing:.06em">DSL PROFICIENCY</h3>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Write a build.gradle.kts from scratch using Kotlin DSL</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Understand the difference between Groovy DSL and Kotlin DSL syntax</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Configure namespace, compileSdk, minSdk, targetSdk correctly</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Set up settings.gradle.kts with pluginManagement block</span></div>
-
-      <h3 style="font-size:13px;font-weight:700;color:var(--muted);margin:20px 0 8px;letter-spacing:.06em">DEPENDENCIES</h3>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Know implementation vs api vs compileOnly and when to use each</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Set up a Firebase BOM dependency correctly</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Create a libs.versions.toml version catalog</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Add a local .aar file as a dependency</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Configure a private Maven repository with credentials</span></div>
-
-      <h3 style="font-size:13px;font-weight:700;color:var(--muted);margin:20px 0 8px;letter-spacing:.06em">BUILD CONFIG</h3>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Create productFlavors for dev/staging/prod environments</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Set up a release signingConfig using a keystore.properties file</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Enable R8/ProGuard minification for release build</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Build a release AAB for the Play Store</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Add buildConfigField to inject environment-specific values</span></div>
-
-      <h3 style="font-size:13px;font-weight:700;color:var(--muted);margin:20px 0 8px;letter-spacing:.06em">ERROR HANDLING</h3>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Fix "Namespace not specified" error independently</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Resolve Multidex 64K method limit error</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Fix AGP/Gradle/Java version incompatibility</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Resolve NDK version mismatch error</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Fix Out of Memory error by tuning JVM heap</span></div>
-      <div class="task-item" onclick="toggleTask(this)"><div class="task-check"></div><span class="task-text">Resolve duplicate class conflicts in dependencies</span></div>
-    </div>
-  </div>
-
-  <!-- ─── QUIZ ─── -->
-  <div class="section" id="tab-quiz">
-    <div class="sec-head"><h2>Test Your Knowledge</h2><div class="sec-line"></div></div>
-    <p class="sec-sub">// 6 questions — click an answer to check it</p>
-
-    <div style="display:flex;flex-direction:column;gap:24px;margin-top:16px" id="quiz-container">
-
-      <div class="quiz-block">
-        <div class="quiz-q">1. Which file should you NEVER commit to Git in an Android/Flutter project?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">build.gradle.kts</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">settings.gradle.kts</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">local.properties</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">gradle-wrapper.properties</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! local.properties contains absolute SDK paths specific to each machine. Always gitignore it.</div>
-        <div class="quiz-feedback bad">✗ Not quite. local.properties contains machine-specific SDK paths and must be gitignored.</div>
-      </div>
-
-      <div class="quiz-block">
-        <div class="quiz-q">2. You want a dependency only available to modules that depend on yours (transitive). Which keyword do you use?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">implementation</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">api</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">compileOnly</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">runtimeOnly</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! api exposes the dependency transitively. Use sparingly — it increases build time.</div>
-        <div class="quiz-feedback bad">✗ The answer is api. It exposes the dependency to consumers of your module.</div>
-      </div>
-
-      <div class="quiz-block">
-        <div class="quiz-q">3. Your app has > 64,000 methods and crashes on API 19 devices. What do you need?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Increase targetSdk</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Enable ProGuard</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">Enable multiDexEnabled + add multidex library</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Add more RAM to gradle.properties</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! For minSdk &lt; 21 you need multiDexEnabled=true AND the multidex library.</div>
-        <div class="quiz-feedback bad">✗ You need multiDexEnabled=true and the androidx.multidex:multidex library for old devices.</div>
-      </div>
-
-      <div class="quiz-block">
-        <div class="quiz-q">4. AGP 8.3 requires which minimum Gradle version?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Gradle 7.6</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Gradle 8.0</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">Gradle 8.2</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">Gradle 8.4+</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! AGP 8.3 requires Gradle 8.4 or higher. Always check the compatibility matrix.</div>
-        <div class="quiz-feedback bad">✗ AGP 8.3 requires Gradle 8.4+. Check developer.android.com/studio/releases/gradle-plugin for the full matrix.</div>
-      </div>
-
-      <div class="quiz-block">
-        <div class="quiz-q">5. In Kotlin DSL, how do you enable minification in the release build type?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">minifyEnabled true</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">isMinifyEnabled = true</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">setMinify(true)</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">minify = enabled</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! Kotlin DSL uses is-prefixed boolean properties: isMinifyEnabled = true.</div>
-        <div class="quiz-feedback bad">✗ In Kotlin DSL, boolean properties use the is prefix: isMinifyEnabled = true. (Groovy uses minifyEnabled true.)</div>
-      </div>
-
-      <div class="quiz-block">
-        <div class="quiz-q">6. Where do you define the Gradle version used to build your project?</div>
-        <div class="quiz-opts">
-          <div class="quiz-opt" onclick="answer(this,'wrong')">build.gradle.kts</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">gradle.properties</div>
-          <div class="quiz-opt" onclick="answer(this,'correct')">gradle/wrapper/gradle-wrapper.properties</div>
-          <div class="quiz-opt" onclick="answer(this,'wrong')">settings.gradle.kts</div>
-        </div>
-        <div class="quiz-feedback ok">✓ Correct! gradle-wrapper.properties → distributionUrl controls exactly which Gradle version is used.</div>
-        <div class="quiz-feedback bad">✗ The Gradle version is set in gradle/wrapper/gradle-wrapper.properties via the distributionUrl property.</div>
-      </div>
-
-    </div>
-  </div>
-
-</div>
-
-<script>
-let completedCount = 0;
-const totalLessons = 8;
-
-function showTab(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  const sec = document.getElementById('tab-' + id);
-  if (sec) sec.classList.add('active');
-  const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(t => {
-    if (t.getAttribute('onclick').includes("'"+id+"'")) t.classList.add('active');
-  });
-}
-
-function toggleError(header) {
-  const body = header.nextElementSibling;
-  const chev = header.querySelector('.chevron');
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
-}
-
-function toggleTask(item) {
-  const check = item.querySelector('.task-check');
-  const wasChecked = check.classList.contains('done');
-  check.classList.toggle('done');
-  if (!wasChecked) {
-    check.innerHTML = '✓';
-    completedCount++;
-  } else {
-    check.innerHTML = '';
-    completedCount--;
-  }
-  updateProgress();
-}
-
-function updateProgress() {
-  const tasks = document.querySelectorAll('.task-check').length;
-  const done = document.querySelectorAll('.task-check.done').length;
-  const pct = Math.round((done / tasks) * 100);
-  const circumference = 138.2;
-  const offset = circumference - (pct / 100) * circumference;
-  document.getElementById('prog-circle').style.strokeDashoffset = offset;
-  document.getElementById('prog-pct').textContent = pct + '%';
-  document.getElementById('done-count').textContent = done;
-}
-
-function answer(el, result) {
-  const block = el.closest('.quiz-block');
-  if (block.dataset.answered) return;
-  block.dataset.answered = '1';
-  const opts = block.querySelectorAll('.quiz-opt');
-  opts.forEach(o => o.style.pointerEvents = 'none');
-  el.classList.add(result);
-  const feedbacks = block.querySelectorAll('.quiz-feedback');
-  feedbacks[result === 'correct' ? 0 : 1].classList.add('show');
-}
-
-function copyCode(btn) {
-  const pre = btn.closest('.code-wrap').querySelector('pre');
-  const text = pre.innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    btn.textContent = 'copied!';
-    btn.style.color = 'var(--accent3)';
-    setTimeout(() => { btn.textContent = 'copy'; btn.style.color = ''; }, 1800);
-  });
-}
-</script>
+  </footer>
 </body>
 </html>
